@@ -19,7 +19,8 @@ SELECT l.imdbid, r.rating
 FROM links as l
 INNER JOIN ratings as r
 ON l.movieid=r.movieid
-WHERE r.rating='5';
+WHERE r.rating='5'
+LIMIT 10;
 
 --3. Аггрегация данных: базовые статистики
 --3.1
