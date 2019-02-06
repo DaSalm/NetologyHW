@@ -22,7 +22,7 @@ tags text
  );'
 
 --ЗАЛИВКА ДАННЫХ В ТАБЛИЦУ
-psql -c "\\copy keywords FROM '/usr/local/share/netology/raw_data/keywords.csv' DELIMITER ',' CSV HEADER"
+psql -c "\\copy keywords FROM '/usr/local/share/netology/raw_data/keywords.csv' DELIMITER ',' CSV HEADER";
 
 --ЗАПРОС3
 WITH top_rated AS (
