@@ -3,7 +3,7 @@ SELECT 'ФИО: Салманова Дарья';
 --a.	Вывести список названий департаментов
 --и количество главных врачей в каждом из этих департаментов
 SELECT 	d.name,
-		COUNT (DISTINCT e.chief_doc_id) as count_chief
+	COUNT (DISTINCT e.chief_doc_id) as count_chief
 FROM Department as d
 LEFT JOIN Employee as e
 ON d.id=e.department_id
@@ -13,7 +13,7 @@ ORDER BY count_chief DESC;
 --b.	Вывести список департаментов, в которых работают 3 
 --и более сотрудников (id и название департамента, количество сотрудников)
 SELECT 	d.id, d.name,
-		COUNT (e.id) as count_id
+	COUNT (e.id) as count_id
 FROM Department as d
 LEFT JOIN Employee as e
 	ON d.id=e.department_id
@@ -25,7 +25,7 @@ ORDER BY count_id DESC;
 --  (id и название департамента, количество публикаций)
 
 SELECT d.id, d.name,
-		SUM (e.num_public) as sum_public
+	SUM (e.num_public) as sum_public
 FROM Department as d
 LEFT JOIN Employee as e
 	ON d.id=e.department_id
@@ -45,7 +45,7 @@ HAVING SUM (e.num_public) IN (
 WITH min_p AS 
 (
 SELECT  department_id, name, num_public,
-		MIN (num_public) OVER (PARTITION BY department_id) as min_public
+	MIN (num_public) OVER (PARTITION BY department_id) as min_public
 FROM Employee 
 GROUP BY department_id, name, num_public
 )
@@ -64,8 +64,8 @@ ORDER BY d.id
 -- (id и название департамента, среднее количество публикаций)
 WITH avg_p AS
 (
-  SELECT DISTINCT department_id,
-AVG (num_public) OVER (PARTITION BY department_id) as avg_public
+SELECT DISTINCT department_id,
+	AVG (num_public) OVER (PARTITION BY department_id) as avg_public
 FROM Employee
 )
 
