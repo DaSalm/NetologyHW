@@ -1,0 +1,71 @@
+CREATE TABLE
+full_results (
+        bib INTEGER PRIMARY KEY,
+        finish_time_sec REAL,
+        finish_time_result VARCHAR(20),
+        race VARCHAR(20),
+        pace_sec DOUBLE PRECISION,
+        pace_minpkm VARCHAR(20),
+        pace_kmph VARCHAR(20),
+        half_pace_sec DOUBLE PRECISION,
+        half_pace_minpkm VARCHAR(20),
+        half_pace_kmph VARCHAR(20),
+        gender_en VARCHAR(20),
+        age SMALLSERIAL,
+        name_en VARCHAR(255),
+        location_city_ru VARCHAR(50),
+        location_city_en VARCHAR(50),
+        country_code_alpha_3 VARCHAR(3),
+        flag_DNF SMALLSERIAL,
+        flag_all_split_exist SMALLSERIAL,
+        race_uniform_index DOUBLE PRECISION
+);
+
+CREATE TABLE split_results (
+        bib INTEGER NOT NULL,
+        split_name VARCHAR(20) NOT NULL,
+        split REAL NOT NULL,
+        split_time_sec INTEGER,
+        split_time_result VARCHAR(50),
+        split_pace_sec REAL,
+        split_pace_minpkm VARCHAR(20),
+        split_pace_kmph VARCHAR(20),
+        split_uniform_index DOUBLE PRECISION,
+        PRIMARY KEY (bib, split_name)
+        );
+
+
+CREATE TABLE country_codes (
+        name VARCHAR(100),
+        alpha_2 VARCHAR(2),
+        alpha_3 VARCHAR(3) PRIMARY KEY,
+        country_code SERIAL,
+        iso_3166_2 VARCHAR(20),
+        region VARCHAR(100),
+        sub_region VARCHAR(100),
+        intermediate_region VARCHAR(30),
+        region_code VARCHAR(3),
+        sub_region_code VARCHAR(3),
+        intermediate_region_code VARCHAR(3)
+        );
+        
+        
+      CREATE TABLE route (
+        id SERIAL PRIMARY KEY,
+        race VARCHAR(20),
+        distance REAL,
+        latitude REAL,
+        longitude REAL,
+        elevation REAL,
+        elevation_delta REAL
+        );
+        
+        psql -c "\\copy full_results FROM '/home/darya/marathon/1_full_results_mm_2018.csv' DELIMITER ',' CSV HEADER";
+        psql -c "\\copy  split_results FROM '/home/darya/marathon/1_split_results_mm_2018.csv' DELIMITER ',' CSV HEADER";    
+        psql -c "\\copy  route FROM '/home/darya/marathon/1_route_mm_2018.csv' DELIMITER ',' CSV HEADER";    
+        psql -c "\\copy  country_codes FROM '/home/darya/marathon/country_codes.csv' DELIMITER ',' CSV HEADER";   
+        
+        SELECT  gender_en, COUNT(bib) 
+        FROM full_results 
+        GROUP BY  gender_en;
+        
