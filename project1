@@ -76,7 +76,7 @@ CREATE TABLE country_codes (
         FROM full_results f
         LEFT JOIN country_codes c
                 ON f.country_code_alpha_3=c.alpha_3
-        WHERE  f.flag_DNF=0 AND race='42.195 km'
+        WHERE  f.flag_DNF=0 AND f.race='42.195 km'
         GROUP BY c.name, race
         LiMIT 10;
         
@@ -93,4 +93,7 @@ CREATE TABLE country_codes (
         WHERE f.race='42.195 km'
         LiMIT 20;
 
---4.Суммарное расстояние, сколько пробежали все финишировавшие участники   
+--4.Суммарное расстояние, сколько пробежали все финишировавшие участники 
+        SELECT SUM(CAST(TRANSLATE(f.race,' km','') AS FLOAT))
+        FROM full_results f
+        WHERE  f.flag_DNF=0 ;
