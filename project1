@@ -65,13 +65,32 @@ CREATE TABLE country_codes (
         psql -c "\\copy  route FROM '/home/darya/marathon/1_route_mm_2018.csv' DELIMITER ',' CSV HEADER";    
         psql -c "\\copy  country_codes FROM '/home/darya/marathon/country_codes.csv' DELIMITER ',' CSV HEADER";   
         
+-- 1.Количество участников женщин, мужчиy       
         SELECT  gender_en, COUNT(bib) 
         FROM full_results 
         GROUP BY  gender_en;
-        
-        SELECT f.country_code_alpha_3, c.name, AVG(f.finish_time_sec)
+
+-- 2.Среднее время по стране без не финишировших, марафон
+        SELECT   ROW_NUMBER() OVER(ORDER BY AVG(f.finish_time_sec)) AS Row, 
+        c.name, race, AVG(f.finish_time_sec)
         FROM full_results f
         LEFT JOIN country_codes c
                 ON f.country_code_alpha_3=c.alpha_3
-        GROUP BY  f.country_code_alpha_3,  c.name
-        ORDER BY AVG(f.finish_time_sec);
+        WHERE  f.flag_DNF=0 AND race='42.195 km'
+        GROUP BY c.name, race
+        LiMIT 10;
+        
+-- 3. Общий зачёт на марафонскую дистанцию
+        SELECT    
+        ROW_NUMBER() OVER(ORDER BY f.finish_time_sec) AS Row,
+        f.name_en,
+        c.name, 
+        f.race,
+        f.finish_time_sec
+        FROM full_results f
+        LEFT JOIN country_codes c
+                ON f.country_code_alpha_3=c.alpha_3
+        WHERE f.race='42.195 km'
+        LiMIT 20;
+
+--4.Суммарное расстояние, сколько пробежали все финишировавшие участники   
