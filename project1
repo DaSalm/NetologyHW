@@ -93,7 +93,34 @@ CREATE TABLE country_codes (
         WHERE f.race='42.195 km'
         LiMIT 20;
 
---4.Суммарное расстояние, сколько пробежали все финишировавшие участники 
+--4. Суммарное расстояние, сколько пробежали все финишировавшие участники 
         SELECT SUM(CAST(TRANSLATE(f.race,' km','') AS FLOAT))
         FROM full_results f
         WHERE  f.flag_DNF=0 ;
+        
+--5. Средний возраст участника на каждой из дистанций
+        SELECT   f.race,
+        AVG(f.age) avg_age
+        FROM full_results f
+        WHERE  f.flag_DNF=0
+        GROUP BY f.race;
+        
+--6. Самый(-ые) молодой(-ые) и самый(-ые) пожилые участники марафонской дистанции - имя, возраст, город, результат
+WITH minmaxage AS (
+	SELECT DISTINCT race,
+  		MIN (age) OVER (PARTITION BY race) as min_age,
+  		MAX (age) OVER (PARTITION BY race) as max_age  
+        FROM full_results 
+        WHERE  flag_DNF=0 AND race='42.195 km'
+)
+SELECT   f.name_en,
+        f.age,
+        f.location_city_en,
+        f.finish_time_result
+FROM full_results f
+JOIN minmaxage m
+        ON f.race=m.race
+WHERE  f.flag_DNF=0 AND f.race='42.195 km' AND f.age IN (min_age, max_age)
+ORDER BY finish_time_result        
+;
+	
