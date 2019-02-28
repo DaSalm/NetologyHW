@@ -1,3 +1,6 @@
+--Cалманова Дарья
+-- Таблицы взяты отсюда: https://www.kaggle.com/krasnovna/moscow-marathon-2018#1_full_results_mm_2018.csv
+
 CREATE TABLE
 full_results (
         bib INTEGER PRIMARY KEY,
@@ -174,7 +177,7 @@ WHERE sum_elev = max_elev
 GROUP BY elev.race ,group_distance ,max_elev
 ;
 
--- 10. 13) Найти участника, максимально разогнавшегося на последнем участке
+-- 10. Найти участника, максимально разогнавшегося на последнем участке
 -- вывести имя, возраст, страну, и  общий результат
 WITH split_end AS (
 SELECT DISTINCT s.split, s.split_name, bib, split_time_sec
