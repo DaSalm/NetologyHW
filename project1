@@ -123,14 +123,6 @@ JOIN minmaxage m
 WHERE  f.flag_DNF=0 AND f.race='42.195 km' AND f.age IN (min_age, max_age)
 ORDER BY finish_time_result        
 ;
---7. Разбить участников на группы по возрасту с шагом 10 лет - для каждой группы вывести средний результат на дистанции 42км, 10км
---ПРОВАЛ
-SELECT f.race, f.gender_en, f.name_en, f.finish_time_sec
-FROM full_results f
-WHERE f.age>65
-GROUP BY f.race, f.gender_en, f.name_en, f.finish_time_sec
-ORDER BY f.finish_time_sec
-LIMIT 10;
 --7. Из нефинишировавших участников марафона после какого участка трассы сколько слилось человек?
 WITH maxs AS (
 SELECT s.bib
@@ -150,3 +142,60 @@ FROM maxs
 GROUP BY maxs.max_split
 ORDER BY last_split_for DESC
 ;
+--8. Разбить участников на группы по возрасту с шагом 10 лет - для каждой группы вывести средний результат на дистанции 42км, 10км
+SELECT f.race
+	, ROUND( f.age/10 , 0) AS group_age
+	, AVG(finish_time_sec) AS avg_time 
+FROM full_results f
+GROUP BY f.race, group_age 
+ORDER BY f.race, group_age
+;
+--9. Какой из 5-километровых участков на дистанции самый трудный по суммарной высоте подъема 
+--(учитывать только положительные значения elevation_delta)?
+WITH elev AS (
+SELECT  r.race
+	, CAST(r.distance AS int)/5 AS group_distance
+	, SUM(r.elevation_delta) AS sum_elev
+	, MAX(SUM(r.elevation_delta) ) OVER (PARTITION BY race) AS max_elev
+FROM route r
+WHERE r.elevation_delta >0
+GROUP BY group_distance, r.race
+ORDER BY r.race, group_distance
+)
+SELECT  elev.race
+	,CONCAT (
+		group_distance*5
+		, ' - '
+		,group_distance*5 +5
+	) AS distance
+	,max_elev
+FROM elev
+WHERE sum_elev = max_elev
+GROUP BY elev.race ,group_distance ,max_elev
+;
+
+-- 10. 13) Найти участника, максимально разогнавшегося на последнем участке
+-- вывести имя, возраст, страну, и  общий результат
+WITH split_end AS (
+SELECT DISTINCT s.split, s.split_name, bib, split_time_sec
+	,MAX (split_time_sec) OVER (PARTITION BY bib)
+	- MIN (split_time_sec) OVER (PARTITION BY bib)	
+	AS les_time_end	
+FROM split_results s 
+WHERE s.split IN ('42.195','40')
+ORDER BY les_time_end
+)
+
+SELECT  DISTINCT f.bib
+	,f.finish_time_sec
+	,f.age
+	,f.name_en
+	,f.country_code_alpha_3
+	,s.les_time_end
+FROM full_results f
+JOIN split_end s
+	ON f.bib = s.bib
+WHERE flag_DNF=0 AND f.race='42.195 km' AND s.les_time_end!=0
+ORDER BY s.les_time_end,finish_time_sec
+LIMIT 1;
+
